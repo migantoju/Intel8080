@@ -14,6 +14,9 @@ public:
 
     uint8_t InPort(uint8_t port); // Read from an input port
 
+    uint8_t port1; // Buttons state for player 1
+    uint8_t port2; // Buttons state for player 2 and others
+
     void OutPort(uint8_t port, uint8_t value); // Write to an output port
 
     CPU8080();
@@ -25,8 +28,6 @@ public:
     void RenderGraphics(Graphics& graphics); // Render the graphics
 
 private:
-    uint8_t port1; // Buttons state for player 1
-    uint8_t port2; // Buttons state for player 2 and others
     uint8_t shiftRegister; // Register shift for graphics
     uint8_t shiftOffset; // Offset for shift registers graphics
 };
