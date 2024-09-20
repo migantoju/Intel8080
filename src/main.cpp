@@ -2,6 +2,9 @@
 #include <iostream>
 #include "graphics.h"
 
+const int FPS = 60;
+const int frameDelay = 1000 / FPS;
+
 int main(int argc, char** argv) {
     if (argc < 2) {
         std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
@@ -16,7 +19,12 @@ int main(int argc, char** argv) {
 
     bool running = true;
 
+    Uint32 frameStart;
+    int frameTime;
+
     while(running) {
+        frameStart = SDL_GetTicks(); // Get the current time
+
         cpu.EmulateCycle();
 
         // Render graphics
@@ -71,6 +79,12 @@ int main(int argc, char** argv) {
         // Print CPU state
         cpu.PrintState();
         std::cin.get(); // Pause after each cycle for debugging
+
+        frameTime = SDL_GetTicks() - frameStart; // Get the time it took to render the frame
+
+        if (frameDelay > frameTime) {
+            SDL_Delay(frameDelay - frameTime); // Delay the frame if we are too fast
+        }
     }
 
     return 0;
