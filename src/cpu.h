@@ -2,6 +2,7 @@
 #define CPU_H
 
 #include <cstdint>
+#include "graphics.h"
 
 class CPU8080 {
 public:
@@ -20,6 +21,8 @@ public:
     void LoadProgram(const char* filename); // Load a program into memory
     void EmulateCycle(); // Emulate a single cycle
     void PrintState(); // Print the state of the CPU
+
+    void RenderGraphics(Graphics& graphics); // Render the graphics
 
 private:
     uint8_t port1; // Buttons state for player 1

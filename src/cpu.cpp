@@ -87,6 +87,25 @@ void CPU8080::OutPort(uint8_t port, uint8_t value) {
     }
 }
 
+void CPU8080::RenderGraphics(Graphics& graphics) {
+    graphics.Clear();
+
+    // Render graphics here
+    // Space Invaders screen has a resolution of 224x256 pixels
+
+    for (int y = 0;  y < 256; ++y) {
+        for (int x = 0; x < 224; ++x) {
+            int byteIndex = 0x2400 + (x / 8) + (224 / 8); // Calculate byte index
+            int bitIndex = x % 8; // Calculate bit index
+            if (memory[byteIndex] & (1 << bitIndex)) { // if bit is set or active
+                graphics.DrawPixel(x, y);
+            } 
+        }
+    } 
+
+    graphics.Update();
+}
+
 void CPU8080::EmulateCycle() {
     uint8_t opcode = memory[PC]; // Fetch opcode from memory
     PC++; // Increment program counter

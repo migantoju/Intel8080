@@ -1,5 +1,6 @@
 #include "cpu.h"
 #include <iostream>
+#include "graphics.h"
 
 int main(int argc, char** argv) {
     if (argc < 2) {
@@ -8,10 +9,23 @@ int main(int argc, char** argv) {
     }
 
     CPU8080 cpu;
+    Graphics graphics;
+
+    graphics.Initialize();
     cpu.LoadProgram(argv[1]);
 
-    while(true) {
+    bool running = true;
+
+    while(running) {
         cpu.EmulateCycle();
+
+        // Render graphics
+        cpu.RenderGraphics(graphics);
+
+        // Handle events
+        graphics.HandleEvents(running);
+
+        // Print CPU state
         cpu.PrintState();
         std::cin.get(); // Pause after each cycle for debugging
     }
