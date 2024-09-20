@@ -39,6 +39,54 @@ void CPU8080::PrintState() {
               << "PC: " << std::hex << PC << std::endl;
 }
 
+uint8_t CPU8080::InPort(uint8_t port) {
+    uint8_t result = 0;
+
+    switch(port) {
+        case 1:
+            result = port1;
+            break;
+        case 2:
+            result = port2;
+            break;
+        case 3:
+            result = (shiftRegister >> (8 - shiftOffset)) & 0xFF;
+            break;
+        default:
+            std::cerr << "Invalid input port: " << std::hex << (int)port << std::endl;
+            break;
+    }
+    return result;
+}
+
+void CPU8080::OutPort(uint8_t port, uint8_t value) {
+    switch(port) {
+        case 2:
+            // Graphic shift configuration
+            shiftOffset = value & 0x07;
+            break;
+        case 3:
+            // Sound configuration
+            // Not implemented
+            break;
+        case 4:
+            // Shift register configuration
+            shiftRegister = (shiftRegister >> 8) | (value << 8);
+            break;
+        case 5:
+            // Sound configuration
+            // Not implemented
+            break;
+        case 6:
+            // Video configuration
+            // Not implemented
+            break;
+        default:
+            std::cerr << "Invalid output port: " << std::hex << (int)port << std::endl;
+            break;
+    }
+}
+
 void CPU8080::EmulateCycle() {
     uint8_t opcode = memory[PC]; // Fetch opcode from memory
     PC++; // Increment program counter
@@ -1056,7 +1104,9 @@ void CPU8080::EmulateCycle() {
             break;
         case 0xD3: // OUT D8
             std::cout << "OUT " << std::hex << (int)memory[PC] << std::endl;
+            uint8_t port = memory[PC];
             PC++;
+            OutPort(port, A);
             break;
         case 0xD4: // CNC adr
             if (!(flags & 0x10)) {
@@ -1104,7 +1154,9 @@ void CPU8080::EmulateCycle() {
             break;
         case 0xDB: // IN D8
             std::cout << "IN " << std::hex << (int)memory[PC] << std::endl;
+            uint8_t port = memory[PC];
             PC++;
+            A = InPort(port);
             break;
         case 0xDC: // CC adr
             if (flags & 0x10) {
