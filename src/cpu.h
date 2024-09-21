@@ -21,7 +21,7 @@ public:
 
     CPU8080();
     void Reset(); // Reset the CPU to its initial state
-    void LoadProgram(const char* filename); // Load a program into memory
+    void LoadProgram(const char* rom1, const char* rom2, const char* rom3, const char* rom4); // Load a program into memory
     void EmulateCycle(); // Emulate a single cycle
     void PrintState(); // Print the state of the CPU
 

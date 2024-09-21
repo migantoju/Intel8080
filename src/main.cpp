@@ -6,8 +6,8 @@ const int FPS = 60;
 const int frameDelay = 1000 / FPS;
 
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        std::cerr << "Usage: " << argv[0] << " <filename>" << std::endl;
+    if (argc < 5) {
+        std::cerr << "Usage: " << argv[0] << " invaders.h invaders.g invaders.f invaders.e" << std::endl;
         return 1;
     }
 
@@ -15,7 +15,7 @@ int main(int argc, char** argv) {
     Graphics graphics;
 
     graphics.Initialize();
-    cpu.LoadProgram(argv[1]);
+    cpu.LoadProgram(argv[1], argv[2], argv[3], argv[4]);
 
     bool running = true;
 
@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
 
     while(running) {
         frameStart = SDL_GetTicks(); // Get the current time
+        std::cout << "Emulating cycle, frame start: "<< frameStart << std::endl;
 
         cpu.EmulateCycle();
 
@@ -78,7 +79,7 @@ int main(int argc, char** argv) {
 
         // Print CPU state
         cpu.PrintState();
-        std::cin.get(); // Pause after each cycle for debugging
+        // std::cin.get(); // Pause after each cycle for debugging
 
         frameTime = SDL_GetTicks() - frameStart; // Get the time it took to render the frame
 

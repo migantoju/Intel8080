@@ -15,16 +15,50 @@ void CPU8080::Reset() {
     std::memset(memory, 0, sizeof(memory));
 }
 
-void CPU8080::LoadProgram(const char* filename) {
-    std::ifstream file(filename, std::ios::binary);
-
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file " << filename << std::endl;
-        return;
+void CPU8080::LoadProgram(const char* rom1, const char* rom2, const char* rom3, const char* rom4) {
+    // Load invaders.h into memory at 0x0000 - 0x07FF
+    std::ifstream file1(rom1, std::ios::binary);
+    if (!file1.is_open()) {
+        std::cerr << "Error: Could not open file " << rom1 << std::endl;
+        exit(1);
     }
+    file1.read(reinterpret_cast<char*>(&memory[0x0000]), 0x0800);
+    file1.close();
 
-    file.read((char*)memory, sizeof(memory));
-    file.close();
+    std::cout << "Loaded " << rom1 << " into memory at 0x0000 - 0x07FF" << std::endl;
+
+    // Load invaders.g into memory at 0x0800 - 0x0FFF
+    std::ifstream file2(rom2, std::ios::binary);
+    if (!file2.is_open()) {
+        std::cerr << "Error: Could not open file " << rom2 << std::endl;
+        exit(1);
+    }
+    file2.read(reinterpret_cast<char*>(&memory[0x0800]), 0x0800);
+    file2.close();
+
+    std::cout << "Loaded " << rom2 << " into memory at 0x0800 - 0x0FFF" << std::endl;
+
+    // Load invaders.f into memory at 0x1000 - 0x17FF
+    std::ifstream file3(rom3, std::ios::binary);
+    if (!file3.is_open()) {
+        std::cerr << "Error: Could not open file " << rom3 << std::endl;
+        exit(1);
+    }
+    file3.read(reinterpret_cast<char*>(&memory[0x1000]), 0x0800);
+    file3.close();
+
+    std::cout << "Loaded " << rom3 << " into memory at 0x1000 - 0x17FF" << std::endl;
+
+    // Load invaders.e into memory at 0x1800 - 0x1FFF
+    std::ifstream file4(rom4, std::ios::binary);
+    if (!file4.is_open()) {
+        std::cerr << "Error: Could not open file " << rom4 << std::endl;
+        exit(1);
+    }
+    file4.read(reinterpret_cast<char*>(&memory[0x1800]), 0x0800);
+    file4.close();
+
+    std::cout << "Loaded " << rom4 << " into memory at 0x1800 - 0x1FFF" << std::endl;
 }
 
 void CPU8080::PrintState() {
@@ -67,7 +101,10 @@ void CPU8080::OutPort(uint8_t port, uint8_t value) {
             break;
         case 3:
             // Sound configuration
-            // Not implemented
+            if (value & 0x01) {
+                // Mix_PlayChannel(-1, sound, 0);
+                std::cout << "Shot Sound" << std::endl;
+            }
             break;
         case 4:
             // Shift register configuration
@@ -75,7 +112,10 @@ void CPU8080::OutPort(uint8_t port, uint8_t value) {
             break;
         case 5:
             // Sound configuration
-            // Not implemented
+            if (value & 0x01) {
+                // Mix_PlayChannel(-1, sound, 0);
+                std::cout << "UFO Sound" << std::endl;
+            }
             break;
         case 6:
             // Video configuration
@@ -1122,11 +1162,13 @@ void CPU8080::EmulateCycle() {
             }
             break;
         case 0xD3: // OUT D8
-            std::cout << "OUT " << std::hex << (int)memory[PC] << std::endl;
-            uint8_t port = memory[PC];
-            PC++;
-            OutPort(port, A);
-            break;
+            {
+                std::cout << "OUT " << std::hex << (int)memory[PC] << std::endl;
+                uint8_t port = memory[PC];
+                PC++;
+                OutPort(port, A);
+                break;
+            }
         case 0xD4: // CNC adr
             if (!(flags & 0x10)) {
                 memory[SP - 1] = (PC >> 8) & 0xFF;
@@ -1172,11 +1214,13 @@ void CPU8080::EmulateCycle() {
             }
             break;
         case 0xDB: // IN D8
+        {
             std::cout << "IN " << std::hex << (int)memory[PC] << std::endl;
             uint8_t port = memory[PC];
             PC++;
             A = InPort(port);
             break;
+        }
         case 0xDC: // CC adr
             if (flags & 0x10) {
                 memory[SP - 1] = (PC >> 8) & 0xFF;
